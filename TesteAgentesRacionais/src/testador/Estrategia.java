@@ -119,6 +119,7 @@ public class Estrategia{
 	 * @return populacao inicial
 	 * */
 	public Populacao geraPopulacaoInicial() {
+		
 		Populacao populacaoInicial = new Populacao();			
 		for (int j = 0; j < N; j++) {
 			populacaoInicial.getIndividuo().add(new Individuo(L+1)); //+1 para incluir o agente
@@ -143,6 +144,7 @@ public class Estrategia{
 	 * @return individuo com alocacao dos elementos no cenario
 	 * */
 	private Individuo preencheCenario(Individuo individuo, int qtde, int codigo, int linha){
+		
 		Random r = new Random();
 		int numRandom;
 		for(int j = 0; j < qtde; j++) {
@@ -164,7 +166,8 @@ public class Estrategia{
 	 * @param populacao com os individuos de maior fitness entre a populacao e a populacao anterior
 	 * */
 	public Populacao selecionaMelhores(Populacao populacao, Populacao melhoresAnt, int geracao) {
-		int maiorFitness = obtemMaiorFitness(populacao);
+		
+		int maiorFitness = obtemMelhorFitness(populacao);
 		Populacao melhoresIndividuos = new Populacao();
 		for(Individuo ind : populacao.getIndividuo()){
 			if (ind.getAvaliacao() == maiorFitness)
@@ -178,17 +181,19 @@ public class Estrategia{
 	/**
 	 * @author raquel silveira
 	 * @version 1.0 
-	 * metodo que obtem o maior fitness entre os individuos
+	 * metodo que obtem o melhor fitness entre os individuos
+	 * como a funcao de avaliacao eh de minimizacao, o melhor fitness eh o menor
+	 * TODO: Analisar para deixar uma funcao mais generica
 	 * @param populacao
-	 * @return maior fitness entre os individuos
+	 * @return melhor fitness entre os individuos
 	 * */
-	private int obtemMaiorFitness(Populacao populacao) {
-		int maiorFitness = 0;
+	private int obtemMelhorFitness(Populacao populacao) {
+		int melhorFitness = Integer.MAX_VALUE;
 		for(Individuo i : populacao.getIndividuo()) {
-			if (i.getAvaliacao() > maiorFitness)
-				maiorFitness = i.getAvaliacao();
+			if (i.getAvaliacao() < melhorFitness)
+				melhorFitness = i.getAvaliacao();
 		}
-		return maiorFitness;
+		return melhorFitness;
 	}
 	
 	/**
@@ -244,7 +249,7 @@ public class Estrategia{
 		int fitness = 0;
 		for (Individuo ind : populacao.getIndividuo()) {
 			fitness += ind.getAvaliacao(); 
-			ind.setFitnessAcumulado(fitness);
+			ind.setFitnessAcumulado(Math.abs(fitness)); //O abs eh adicionado para evitar problemas com valores negativos
 		}		
 		
 		//Seleciona os individuos conforme metodo da roleta
@@ -252,7 +257,7 @@ public class Estrategia{
 		try {
 			Random random = new Random();
 			for (int i = 0; i < N; i++) {
-				int selecao = random.nextInt(fitness);
+				int selecao = random.nextInt(Math.abs(fitness)); //O abs eh adicionado para evitar problemas com valores negativos
 				pares.getIndividuo().add(obtemIndividuoFitnessAcumulado(populacao, selecao).clone());	
 			}
 		} catch (CloneNotSupportedException e) {

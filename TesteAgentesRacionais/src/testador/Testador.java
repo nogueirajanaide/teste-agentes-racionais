@@ -124,7 +124,9 @@ public class Testador extends Agent{
 	private boolean teste() {
 		System.out.println("Teste: " + Estrategia.geracao + " " + interacao);
 		return (Estrategia.geracao <= Estrategia.max_gera && 
-				Estrategia.melhorFitness <= Estrategia.max_fit);
+				Estrategia.melhorFitness >= Estrategia.max_fit); 
+		//Como a funcao eh de minimizacao, o melhor tem que ser maior que o maximo fitness
+		//TODO: Analisar uma forma de deixar essa comparacao mais generica
 	}
 		
 	/**

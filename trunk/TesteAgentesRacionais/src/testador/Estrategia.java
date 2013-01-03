@@ -18,12 +18,12 @@ public class Estrategia{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	static int geracao = 0, Max_gera, melhorFitness, Max_fit;
+	static int geracao = 0, max_gera, melhorFitness, max_fit;
 	int N, L, Pm, CodAgente, QE;
 	int[][] elementos = null;
 	String path;
 	static ArquivoUtils arquivo;
-	Populacao melhoresIndividuos =  new Populacao();
+	static Populacao melhoresIndividuos =  new Populacao();
 	static ArrayList<FuncaoAvaliacao> funcaoAvaliacao = new ArrayList<FuncaoAvaliacao>();
 		
 	public Estrategia() {
@@ -44,8 +44,8 @@ public class Estrategia{
 			L = Integer.parseInt(doc.getElementsByTagName("L").item(0).getTextContent());
 			CodAgente = Integer.parseInt(doc.getElementsByTagName("CodAgente").item(0).getTextContent());
 			Pm = Integer.parseInt(doc.getElementsByTagName("Pm").item(0).getTextContent());
-			Max_gera = Integer.parseInt(doc.getElementsByTagName("Max_gera").item(0).getTextContent());
-			Max_fit = Integer.parseInt(doc.getElementsByTagName("Max_fit").item(0).getTextContent());
+			max_gera = Integer.parseInt(doc.getElementsByTagName("Max_gera").item(0).getTextContent());
+			max_fit = Integer.parseInt(doc.getElementsByTagName("Max_fit").item(0).getTextContent());
 			path = doc.getElementsByTagName("Path").item(0).getTextContent();
 			QE = Integer.parseInt(doc.getElementsByTagName("QE").item(0).getTextContent());
 			
@@ -163,7 +163,7 @@ public class Estrategia{
 	 * @param indice da geracao
 	 * @param populacao com os individuos de maior fitness entre a populacao e a populacao anterior
 	 * */
-	private Populacao selecionaMelhores(Populacao populacao, Populacao melhoresAnt, int geracao) {
+	public Populacao selecionaMelhores(Populacao populacao, Populacao melhoresAnt, int geracao) {
 		int maiorFitness = obtemMaiorFitness(populacao);
 		Populacao melhoresIndividuos = new Populacao();
 		for(Individuo ind : populacao.getIndividuo()){

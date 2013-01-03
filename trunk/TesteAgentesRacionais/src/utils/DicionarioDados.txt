@@ -1,0 +1,5 @@
+Dicionario de Dados
+
+Codigo dos Elementos
+ 0: Limpo
+ 1: Sujo

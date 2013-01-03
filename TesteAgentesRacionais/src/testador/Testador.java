@@ -56,11 +56,9 @@ public class Testador extends Agent{
 	protected void setup() {
 		
 		System.out.println("Setup: " + Estrategia.geracao + " " + interacao);
-		//System.out.println("TESTADOR! - VER");
+		
 		ver();
-		//System.out.println("TESTADOR! - PROXIMO");
 		proximo();
-		//System.out.println("TESTADOR! - ACAO");
 		acao();
 	}
 	
@@ -71,8 +69,8 @@ public class Testador extends Agent{
 	 * TODO: Analisar a implementacao - A principio nao faz nada
 	 */
 	private void ver() {
-		System.out.println("Ver: " + Estrategia.geracao + " " + interacao);
-				
+		
+		System.out.println("Ver: " + Estrategia.geracao + " " + interacao);	
 	}
 	
 	/**
@@ -99,7 +97,6 @@ public class Testador extends Agent{
 	 * @version 1.0
 	 * Subsistema acao
 	 * Metodo que testa a continuidade da geracao de novos cenarios de teste (se sim, gera novos casos de teste)
-	 * TODO: Analisar a implementacao deste metodo
 	 */
 	private void acao() {
 		
@@ -110,22 +107,24 @@ public class Testador extends Agent{
 			utilidade();
 			sucessor();
 		}
-		else
-		{ blockingReceive(); }
+		else {
+			
+			Estrategia.arquivo.imprime3(estadoInterno.getCasosTeste(), Estrategia.melhoresIndividuos);
+			System.out.println("Melhores indivíduos = " + Estrategia.melhoresIndividuos);
+			blockingReceive();
+		}
 	}
 	
 	/**
 	 * @author raquel silveia
 	 * @version 1.0
 	 * Metodo que verifica se eh para continuar a geracao de casos de teste
-	 * A principio continua se a geracao for <= 4
-	 * TODO: Falta implementar
 	 * @return true - continuar a geracao de casos de teste
 	 */
 	private boolean teste() {
 		System.out.println("Teste: " + Estrategia.geracao + " " + interacao);
-		return (Estrategia.geracao <= Estrategia.Max_gera && 
-				Estrategia.melhorFitness <= Estrategia.Max_fit);
+		return (Estrategia.geracao <= Estrategia.max_gera && 
+				Estrategia.melhorFitness <= Estrategia.max_fit);
 	}
 		
 	/**
@@ -200,7 +199,6 @@ public class Testador extends Agent{
 	private void finalise() {
 		
 		System.out.println("Finalise: " + Estrategia.geracao + " " + interacao);
-		//acao();
 	}
 	
 	/**
@@ -217,13 +215,12 @@ public class Testador extends Agent{
 		try {
 			
 			if (((Estado)receptor.getContentObject()).getAcao() == Acao.PARAR) {
+			
 				estadoInterno.getCasosTeste().getIndividuo().get(interacao).setHistoria((ArrayList<Estado>)historia.clone());
-						
 				Estrategia.arquivo.imprimeHistoria(estadoInterno.getCasosTeste().getIndividuo().get(interacao));	
 				behaviour.block();
 				interacao++;
 				proximo();
-				//setup(); //TODO: proximo() ???
 				return false;
 			}
 		}
@@ -247,10 +244,9 @@ public class Testador extends Agent{
 			if (receptor != null) {
 				
 				//System.out.println("TESTADOR - RECEBE MSG");
-				
 				String destino = obtemDestinario(receptor.getSender().getLocalName());
 				ACLMessage destinatario = new ACLMessage(ACLMessage.INFORM);
-				destinatario.addReceiver(new AID(destino ,AID.ISLOCALNAME));
+				destinatario.addReceiver(new AID(destino, AID.ISLOCALNAME));
 				
 				if (destino.equalsIgnoreCase(estadoInterno.getAGENTE())) {
 					destinatario.setContentObject(receptor.getContentObject());
@@ -305,7 +301,8 @@ public class Testador extends Agent{
 		//System.out.println(estadoInterno.getCasosTeste().getIndividuo().size());
 			
 		//Caso a populacao ja tenha sido testada, obtem uma nova populacao
-		if (estadoInterno.getCasosTeste() == null || interacao >= estadoInterno.getCasosTeste().getIndividuo().size()) {
+		if (estadoInterno.getCasosTeste() == null || 
+				interacao >= estadoInterno.getCasosTeste().getIndividuo().size()) {
 			//System.out.println("Entrou no if do sucessor!");
 			//System.out.println(estadoInterno.getCasosTeste());
 			
@@ -348,7 +345,12 @@ public class Testador extends Agent{
 			//System.out.println("Historia: " + casoTeste.getHistoria());
 			//System.out.println("Avaliacao: " + casoTeste.getAvaliacao());
 		}
-		//System.out.println("Saiu da utilidade");
+		
+		//Obtem os melhores individuos avaliados
+		Estrategia.melhoresIndividuos = estrategia.selecionaMelhores(estadoInterno.getCasosTeste(), Estrategia.melhoresIndividuos, Estrategia.geracao);
+		System.out.println("Melhores individuos: " + Estrategia.melhoresIndividuos);
+		Estrategia.melhorFitness = Estrategia.melhoresIndividuos.getIndividuo().get(0).getAvaliacao();
+		System.out.println("Melhor fitness: " + Estrategia.melhorFitness);
 	}
 	
 	/**

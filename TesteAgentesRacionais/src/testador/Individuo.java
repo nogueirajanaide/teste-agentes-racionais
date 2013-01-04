@@ -10,10 +10,31 @@ public class Individuo implements Cloneable, Comparable<Individuo> {
 		cenario = new Integer[qtdeElementos];
 	}
 	
+	/**
+	 * Representa o cenario de teste do individuo
+	 */
 	private Integer[] cenario;
-	private Integer avaliacao;
+	
+	/**
+	 * Representa o fitnessAcumulado entre os individuos
+	 * Utilizado para o metodo da roleta no cruzamento
+	 */
 	private Integer fitnessAcumulado;
+	
+	/**
+	 * Representa a melhor historia das repeticoes, ou seja, a historia melhor avaliada
+	 */
 	private ArrayList<Estado> historia = new ArrayList<Estado>();
+	
+	/**
+	 * Representa a avaliacao da historia selecionada
+	 */
+	private Integer avaliacao;
+	
+	/**
+	 * Representa as historias das repeticoes do caso de teste
+	 */
+	public ArrayList<ArrayList<Estado>> listaHistorias = null;
 		
 	public void setCenario(Integer[] cenario) {
 		this.cenario = cenario;

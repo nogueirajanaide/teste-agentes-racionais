@@ -1,45 +1,51 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <config>
+	<!-- Numero de idividuos -->
 	<N>4</N>
-	<L>16</L>
+	
+	<!-- Cod do Agente. Verificar a necessidade desta configuracao -->
 	<CodAgente>5</CodAgente>
+	
+	<!-- Parametro da mutacao -->
 	<Pm>3</Pm>
+	
+	<!-- Qtde maxima de geracoes -->
 	<Max_gera>4</Max_gera>
-	<Max_fit>1000</Max_fit>
+	
+	<!-- Valor maximo do fitness -->
+	<Max_fit>-1000000</Max_fit>
+	
+	<!-- Diretorio de saida dos resultados -->
 	<Path>C:\\Users\\Raquel\\Documents\\MACC\\Proposta\\Modelo Agente\\busca_log.txt</Path>
-	<QE>5</QE>
+	
+	<!-- Representa a qtde de repeticoes nos testes -->
+	<Repeticao>5</Repeticao>
+	
+	<!-- Elementos disponiveis no cenario de teste-->
+	<!-- O numero de sala eh calculado pelo somatorio das qtdes -->
+	<!-- O numero de elementos eh calculad pela qtde de codigos informados -->
 	<Elementos>
 		<Detalhe>
-			<Qtde>4</Qtde>
-			<Codigo>0</Codigo>
+			<Qtde>8</Qtde>
+			<Codigo>0</Codigo> <!-- 0: Limpo -->
 		</Detalhe>
 		<Detalhe>
-			<Qtde>4</Qtde>
-			<Codigo>1</Codigo>
-		</Detalhe>
-		<Detalhe>
-			<Qtde>4</Qtde>
-			<Codigo>2</Codigo>
-		</Detalhe>
-		<Detalhe>
-			<Qtde>2</Qtde>
-			<Codigo>3</Codigo>
-		</Detalhe>
-		<Detalhe>
-			<Qtde>2</Qtde>
-			<Codigo>4</Codigo>
+			<Qtde>8</Qtde>
+			<Codigo>1</Codigo> <!-- 1: Sujo -->
 		</Detalhe>
 	</Elementos>
+	
+	<!-- Definicao da funcao avaliacao -->
 	<FuncaoAvaliacao>
 		<Medida>
 			<Elemento>0</Elemento>
 			<Acao>Direita</Acao>
-			<Pontuacao>1</Pontuacao>
+			<Pontuacao>-1</Pontuacao>
 		</Medida>
 		<Medida>
 			<Elemento>0</Elemento>
 			<Acao>Esquerda</Acao>
-			<Pontuacao>1</Pontuacao>
+			<Pontuacao>-1</Pontuacao>
 		</Medida>
 		<Medida>
 			<Elemento>0</Elemento>

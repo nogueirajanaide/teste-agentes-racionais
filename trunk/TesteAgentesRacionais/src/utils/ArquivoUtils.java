@@ -134,7 +134,8 @@ public class ArquivoUtils {
 			arquivo.write("Cenário de teste: ");
 			arquivo.write(cenario.toString());
 			arquivo.newLine();
-			arquivo.write("História: "+ Arrays.toString(cenario.getHistoria().toArray()));
+			if (cenario != null && cenario.getHistoria() != null && cenario.getHistoria().size() > 0)
+			{ arquivo.write("História: " + Arrays.toString(cenario.getHistoria().toArray())); }
 			arquivo.newLine();
 			arquivo.newLine();
 			arquivo.close();

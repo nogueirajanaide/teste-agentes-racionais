@@ -9,6 +9,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 
+import ambiente.Estado;
+
 import utils.ArquivoUtils;
 
 public class Estrategia{
@@ -18,7 +20,7 @@ public class Estrategia{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	static int geracao = 0, max_gera, melhorFitness, max_fit;
+	static int geracao = 0, max_gera, melhorFitness, max_fit, repeticao;
 	int N, L, Pm, CodAgente, QE;
 	int[][] elementos = null;
 	String path;
@@ -37,21 +39,23 @@ public class Estrategia{
 	 * */
 	private void configuraParametros() {
 		try {
+			
 			DocumentBuilderFactory xml = DocumentBuilderFactory.newInstance();		
 			Document doc = xml.newDocumentBuilder().parse(new File("src\\utils\\config.xml"));
 			
 			N = Integer.parseInt(doc.getElementsByTagName("N").item(0).getTextContent());
-			L = Integer.parseInt(doc.getElementsByTagName("L").item(0).getTextContent());
 			CodAgente = Integer.parseInt(doc.getElementsByTagName("CodAgente").item(0).getTextContent());
 			Pm = Integer.parseInt(doc.getElementsByTagName("Pm").item(0).getTextContent());
 			max_gera = Integer.parseInt(doc.getElementsByTagName("Max_gera").item(0).getTextContent());
 			max_fit = Integer.parseInt(doc.getElementsByTagName("Max_fit").item(0).getTextContent());
 			path = doc.getElementsByTagName("Path").item(0).getTextContent();
-			QE = Integer.parseInt(doc.getElementsByTagName("QE").item(0).getTextContent());
+			repeticao = Integer.parseInt(doc.getElementsByTagName("Repeticao").item(0).getTextContent());
 			
+			QE = doc.getElementsByTagName("Qtde").getLength();			
 			elementos = new int[QE][2]; //coluna 1: qtde; coluna 2: codigo do elemento
 			for (int i = 0; i < doc.getElementsByTagName("Qtde").getLength(); i++) {
 				elementos[i][0] = Integer.parseInt(doc.getElementsByTagName("Qtde").item(i).getTextContent());
+				L += elementos[i][0];
 				elementos[i][1] = Integer.parseInt(doc.getElementsByTagName("Codigo").item(i).getTextContent());
 			}
 			
@@ -96,11 +100,14 @@ public class Estrategia{
 			//System.out.println("Geracao > 0");
 			//if (geracao < Max_gera && melhorFitness <= Max_fit) {
 				
-				System.out.println("Entrou no if");
+				//System.out.println("Entrou no if");
 				//geracao++;
 				populacao = sucessor(populacaoAnalisada);
+				/*System.out.println("Populacao: (obtemPopulacao) " + populacao);
 				melhoresIndividuos = selecionaMelhores(populacao, melhoresIndividuos, geracao);
-				melhorFitness = melhoresIndividuos.getIndividuo().get(0).getAvaliacao();
+				System.out.println("Melhores individuos: (obtemPopulacao) " + melhoresIndividuos);
+				System.out.println("Qtde individuos: (obtemPopulacao) " + melhoresIndividuos.getIndividuo().size());
+				melhorFitness = melhoresIndividuos.getIndividuo().get(0).getAvaliacao();*/
 			//}		
 		}
 		
@@ -170,7 +177,7 @@ public class Estrategia{
 		int maiorFitness = obtemMelhorFitness(populacao);
 		Populacao melhoresIndividuos = new Populacao();
 		for(Individuo ind : populacao.getIndividuo()){
-			if (ind.getAvaliacao() == maiorFitness)
+			if (ind.getAvaliacao() != null && ind.getAvaliacao() == maiorFitness)
 				melhoresIndividuos.getIndividuo().add(ind);
 		}
 		
@@ -190,9 +197,11 @@ public class Estrategia{
 	private int obtemMelhorFitness(Populacao populacao) {
 		int melhorFitness = Integer.MAX_VALUE;
 		for(Individuo i : populacao.getIndividuo()) {
-			if (i.getAvaliacao() < melhorFitness)
+			if (i.getAvaliacao() != null && i.getAvaliacao() < melhorFitness)
 				melhorFitness = i.getAvaliacao();
 		}
+		
+		System.out.println("Melhor fitness: " + melhorFitness);
 		return melhorFitness;
 	}
 	
@@ -232,7 +241,7 @@ public class Estrategia{
 	private double obtemFitnessMedio(Populacao populacao) {
 		int fitness = 0;
 		for(int i = 0; i < populacao.getIndividuo().size(); i++) {
-			fitness += populacao.getIndividuo().get(i).getAvaliacao();
+			fitness += (populacao.getIndividuo().get(i).getAvaliacao() != null ? populacao.getIndividuo().get(i).getAvaliacao() : 0);
 		}
 		return fitness/populacao.getIndividuo().size();
 	}
@@ -258,7 +267,14 @@ public class Estrategia{
 			Random random = new Random();
 			for (int i = 0; i < N; i++) {
 				int selecao = random.nextInt(Math.abs(fitness)); //O abs eh adicionado para evitar problemas com valores negativos
-				pares.getIndividuo().add(obtemIndividuoFitnessAcumulado(populacao, selecao).clone());	
+				
+				Individuo novoIndividuo = obtemIndividuoFitnessAcumulado(populacao, selecao).clone();
+				novoIndividuo.setHistoria(new ArrayList<Estado>());
+				novoIndividuo.listaHistorias = null;
+				novoIndividuo.setAvaliacao(null);
+				novoIndividuo.setHistoria(null);
+				
+				pares.getIndividuo().add(novoIndividuo);
 			}
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();

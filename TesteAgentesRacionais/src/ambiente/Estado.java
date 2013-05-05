@@ -8,31 +8,55 @@ public class Estado implements Serializable {
 	
 	public Estado() {}
 	
-	public Estado(int posicao, Integer elemento) {
-		this.posicao = posicao;
-		this.elemento = elemento;
+	public Estado(int posicaoLinha, int posicaoColuna, Integer[][] cenario, int qtdeLinhaColuna) {
+		this.posicaoLinha = posicaoLinha;
+		this.posicaoColuna = posicaoColuna;
+		this.cenario = cenario;
+		this.qtdeLinhaColuna = qtdeLinhaColuna;
 	}
 	
-	private int posicao;
+	private int posicaoLinha;
 	
-	private Integer elemento;
+	private int posicaoColuna;
+	
+	private int qtdeLinhaColuna;
+	
+	private Integer[][] cenario;
 	
 	private Acao acao;
 	
-	public int getPosicao() {
-		return posicao;
+	private int pontuacao;
+	
+	public int getPosicaoLinha() {
+		return posicaoLinha;
 	}
 
-	public void setPosicao(int posicao) {
-		this.posicao = posicao;
+	public void setPosicaoLinha(int posicaoLinha) {
+		this.posicaoLinha = posicaoLinha;
+	}
+	
+	public int getPosicaoColuna(){
+		return posicaoColuna;
+	}
+	
+	public void setPosicaoColuna(int posicaoColuna){
+		this.posicaoColuna = posicaoColuna;
 	}
 
-	public Integer getElemento() {
-		return elemento;
+	public int getQtdeLinhaColuna() {
+		return qtdeLinhaColuna;
+	}
+	
+	public void setQtdeLinhaColuna(int qtdeLinhaColuna) {
+		this.qtdeLinhaColuna = qtdeLinhaColuna;
+	}
+	
+	public Integer[][] getCenario() {
+		return cenario;
 	}
 
-	public void setDescricao(Integer elemento) {
-		this.elemento = elemento;
+	public void setCenario(Integer[][] cenario) {
+		this.cenario = cenario;
 	}
 	
 	public Acao getAcao() {
@@ -43,8 +67,18 @@ public class Estado implements Serializable {
 		this.acao = acao;
 	}
 	
+	public int getPontuacao() {
+		return pontuacao;
+	}
+	
+	public void setPontuacao(int pontuacao) {
+		this.pontuacao = pontuacao;
+	}
+	
 	@Override
 	public String toString() {
-		return posicao + " - " + elemento + " --> " + acao;
+		if (cenario != null)
+			return posicaoLinha + "," + posicaoColuna + " - " + cenario[posicaoLinha][posicaoColuna] + " --> " + acao + " [" + pontuacao + "] ";
+		return "";
 	}
 }

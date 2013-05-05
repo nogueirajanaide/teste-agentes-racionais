@@ -18,7 +18,7 @@ public class Ambiente extends Agent{
 	private static final long serialVersionUID = 1L;
 	
 	public static Individuo estadoInterno = null;
-	public static int posicaoAgente = 0;
+	public static int posicaoAgenteL = 0, posicaoAgenteC = 0; //L = Linha; C = Coluna
 	private ACLMessage msg = null;
 	
 	protected void setup() {
@@ -80,10 +80,11 @@ public class Ambiente extends Agent{
 		try {
 			if (msg != null) {
 				ACLMessage reply = msg.createReply();
+				
 				if (analisaAmbiente()){
-					reply.setContentObject(new Estado(posicaoAgente, -1));
-				} else {
-					reply.setContentObject(new Estado(posicaoAgente, estadoInterno.getCenario()[posicaoAgente]));
+					reply.setContentObject(new Estado(posicaoAgenteL, posicaoAgenteC, null, estadoInterno.getCenario().length));
+				} else { 
+					reply.setContentObject(new Estado(posicaoAgenteL, posicaoAgenteC, estadoInterno.getCenario(), estadoInterno.getCenario().length));
 				}
 				myAgent.send(reply);
 			}
@@ -102,11 +103,15 @@ public class Ambiente extends Agent{
 	private void alteraEstadoInterno(Acao acao) {
 		switch (acao) {
 			case ASPIRAR:
-				{ estadoInterno.getCenario()[posicaoAgente] = 0; break; }
+				{ estadoInterno.getCenario()[posicaoAgenteL][posicaoAgenteC] = 0; break; }
 			case DIREITA:
-				{ posicaoAgente += 1; break; }
+				{ posicaoAgenteC += 1; break; }
 			case ESQUERDA:
-				{ posicaoAgente -= 1; break; }
+				{ posicaoAgenteC -= 1; break; }
+			case PARA_CIMA:
+				{ posicaoAgenteL -= 1; break;}
+			case PARA_BAIXO:
+				{ posicaoAgenteL += 1; break; }
 		}
 	}
 	
@@ -118,9 +123,11 @@ public class Ambiente extends Agent{
 	 **/
 	private Boolean analisaAmbiente() {
 		
-		for(Integer item : estadoInterno.getCenario()) {
-			if (item != 0)
-				return false;
+		for (int i = 0; i < estadoInterno.getCenario().length; i++) {
+			for (int j = 0; j < estadoInterno.getCenario().length; j++) {
+				if (estadoInterno.getCenario()[i][j] != 0) 
+					return false;
+			}
 		}
 		return true;
 	}

@@ -9,10 +9,10 @@ public class EstadoTestador {
 	private int N;
 	
 	//Identificação do programa Agente
-	private final String AGENTE = "Ag";
+	private final String AGENTE = "Agente";
 	
 	//Identificação do programa Ambiente
-	private final String AMBIENTE = "Amb";
+	private final String AMBIENTE = "Ambiente";
 	
 	//Um conjunto de casos de teste
 	private Populacao CasosTeste;

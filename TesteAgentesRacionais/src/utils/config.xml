@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <config>
 	<!-- Numero de idividuos -->
-	<N>4</N>
+	<N>20</N>
 	
 	<!-- Cod do Agente. Verificar a necessidade desta configuracao -->
 	<CodAgente>5</CodAgente>
@@ -10,7 +10,7 @@
 	<Pm>3</Pm>
 	
 	<!-- Qtde maxima de geracoes -->
-	<Max_gera>4</Max_gera>
+	<Max_gera>60</Max_gera>
 	
 	<!-- Valor maximo do fitness -->
 	<Max_fit>-1000000</Max_fit>
@@ -24,6 +24,7 @@
 	<!-- Elementos disponiveis no cenario de teste-->
 	<!-- O numero de sala eh calculado pelo somatorio das qtdes -->
 	<!-- O numero de elementos eh calculad pela qtde de codigos informados -->
+	<!-- A quantidade de elementos deve formar uma matriz quadrada -->
 	<Elementos>
 		<Detalhe>
 			<Qtde>8</Qtde>
@@ -49,6 +50,16 @@
 		</Medida>
 		<Medida>
 			<Elemento>0</Elemento>
+			<Acao>Para_cima</Acao>
+			<Pontuacao>-1</Pontuacao>
+		</Medida>
+		<Medida>
+			<Elemento>0</Elemento>
+			<Acao>Para_baixo</Acao>
+			<Pontuacao>-1</Pontuacao>
+		</Medida>
+		<Medida>
+			<Elemento>0</Elemento>
 			<Acao>Aspirar</Acao>
 			<Pontuacao>-1</Pontuacao>
 		</Medida>
@@ -65,6 +76,16 @@
 		<Medida>
 			<Elemento>1</Elemento>
 			<Acao>Esquerda</Acao>
+			<Pontuacao>-1</Pontuacao>
+		</Medida>
+		<Medida>
+			<Elemento>1</Elemento>
+			<Acao>Para_baixo</Acao>
+			<Pontuacao>-1</Pontuacao>
+		</Medida>
+		<Medida>
+			<Elemento>1</Elemento>
+			<Acao>Para_cima</Acao>
 			<Pontuacao>-1</Pontuacao>
 		</Medida>
 	</FuncaoAvaliacao>

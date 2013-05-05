@@ -2,6 +2,7 @@ package testador;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -20,10 +21,10 @@ public class Estrategia{
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	static int geracao = 0, max_gera, melhorFitness, max_fit, repeticao;
+	public static int geracao = 0, max_gera, melhorFitness, max_fit, repeticao, qLinhaColuna;
 	int N, L, Pm, CodAgente, QE;
 	int[][] elementos = null;
-	String path;
+	public static String path;
 	static ArquivoUtils arquivo;
 	static Populacao melhoresIndividuos =  new Populacao();
 	static ArrayList<FuncaoAvaliacao> funcaoAvaliacao = new ArrayList<FuncaoAvaliacao>();
@@ -58,6 +59,7 @@ public class Estrategia{
 				L += elementos[i][0];
 				elementos[i][1] = Integer.parseInt(doc.getElementsByTagName("Codigo").item(i).getTextContent());
 			}
+			qLinhaColuna = (int)Math.sqrt(L);
 			
 			//Obtem as medidas de avaliacao
 			for (int i = 0; i <  doc.getElementsByTagName("Medida").getLength(); i++) {
@@ -86,14 +88,14 @@ public class Estrategia{
 	 * */
 	public Populacao obtemPopulacao(Populacao populacaoAnalisada) {
 		
-		System.out.println("obtem Populacao");
+		//System.out.println("obtem Populacao");
 		Populacao populacao = null;
 		  
 		if (geracao == 0) {
-			//System.out.println("Geracao = 0");
 			//Gera a populacao inicial
+			System.out.println("Pop inicial");
 			populacao = geraPopulacaoInicial();
-			melhoresIndividuos = selecionaMelhores(populacao, melhoresIndividuos, geracao);
+			melhoresIndividuos = selecionaMelhores(populacao, null, geracao);
 			//geracao++;
 		} else {
 			
@@ -113,8 +115,8 @@ public class Estrategia{
 		
 		//Acabou o teste
 		if (populacao == null) {
+			System.out.println("Melhores indivíduos = " + melhoresIndividuos);
 			arquivo.imprime3(populacaoAnalisada, melhoresIndividuos);
-			System.out.println("Melhores indivíduos = " + melhoresIndividuos);	
 		}
 		return populacao;
 	}
@@ -127,15 +129,19 @@ public class Estrategia{
 	 * */
 	public Populacao geraPopulacaoInicial() {
 		
+		System.out.println("Entrou aqui!");
+		
 		Populacao populacaoInicial = new Populacao();			
 		for (int j = 0; j < N; j++) {
-			populacaoInicial.getIndividuo().add(new Individuo(L+1)); //+1 para incluir o agente
+			populacaoInicial.getIndividuo().add(new Individuo(L));
 			//Adiciona o agente na primeira posicao do cenario
-			populacaoInicial.getIndividuo().get(j).getCenario()[0] = CodAgente;
+			//populacaoInicial.getIndividuo().get(j).getCenario()[0][0] = CodAgente;
 			
 			for(int i = 0; i < QE; i++)
-				preencheCenario(populacaoInicial.getIndividuo().get(j), elementos[i][0], elementos[i][1], j);		
+				preencheCenario(populacaoInicial.getIndividuo().get(j), elementos[i][0], elementos[i][1]);		
 		}
+		
+		System.out.println(populacaoInicial.getIndividuo());
 		
 		return populacaoInicial;
 	}
@@ -150,15 +156,17 @@ public class Estrategia{
 	 * @param indice do individuo
 	 * @return individuo com alocacao dos elementos no cenario
 	 * */
-	private Individuo preencheCenario(Individuo individuo, int qtde, int codigo, int linha){
+	private Individuo preencheCenario(Individuo individuo, int qtde, int codigo){
 		
 		Random r = new Random();
-		int numRandom;
+		int randomLinha, randomColuna;		
+		
 		for(int j = 0; j < qtde; j++) {
 			do {
-				numRandom = r.nextInt(L);
-			} while (individuo.getCenario()[numRandom+1] != null); //+1 pq o agente estah na posicao 0
-			individuo.setValorCenario(numRandom+1, codigo);
+				randomLinha = r.nextInt(qLinhaColuna);
+				randomColuna = r.nextInt(qLinhaColuna);				
+			} while (individuo.getCenario()[randomLinha][randomColuna] != null);
+			individuo.setValorCenario(randomLinha, randomColuna, codigo);
 		}
 		return individuo;
 	}
@@ -174,15 +182,52 @@ public class Estrategia{
 	 * */
 	public Populacao selecionaMelhores(Populacao populacao, Populacao melhoresAnt, int geracao) {
 		
-		int maiorFitness = obtemMelhorFitness(populacao);
 		Populacao melhoresIndividuos = new Populacao();
-		for(Individuo ind : populacao.getIndividuo()){
-			if (ind.getAvaliacao() != null && ind.getAvaliacao() == maiorFitness)
-				melhoresIndividuos.getIndividuo().add(ind);
+		Integer maiorFitness = obtemMelhorFitness(populacao); //Maior fitness da populacao atual
+		Integer maiorFitnessAnt = obtemMelhorFitness(melhoresAnt); //Maior fitness da populacao anterior
+
+		//O melhor individuo eh aquele que possui o menor fitness
+		//Verifica se os individuos da populacao anterior sao melhores que os da populacao atual
+		//Se for, adiciona os individuos da populacao anterior na lista dos melhores individuos
+		if (maiorFitnessAnt != null && maiorFitness != null && maiorFitnessAnt <= maiorFitness) {
+			for(Individuo ind : melhoresAnt.getIndividuo()){
+				if (ind.getAvaliacao() != null && ind.getAvaliacao() == maiorFitnessAnt &&
+						!verificaMelhorIndividuoRepetido(melhoresIndividuos, ind) )
+					melhoresIndividuos.getIndividuo().add(ind);
+			}	
 		}
 		
-		arquivo.imprime1(geracao, populacao, obtemFitnessMedio(populacao), melhoresIndividuos);
+		//Verifica se os individuos da populacao atual sao melhores que a populacao anterior
+		//Se for, adiciona os individuos da populacao atual na lista dos melhores individuos
+		if (maiorFitnessAnt == null || (maiorFitness != null && maiorFitnessAnt != null) && 
+				maiorFitness < maiorFitnessAnt)
+		{
+			for(Individuo ind : populacao.getIndividuo()){
+				if (ind.getAvaliacao() != null && ind.getAvaliacao() == maiorFitness &&
+						!verificaMelhorIndividuoRepetido(melhoresIndividuos, ind) )
+					melhoresIndividuos.getIndividuo().add(ind);
+			}
+		}
+
+		//arquivo.imprime1(geracao, populacao, obtemFitnessMedio(populacao), melhoresIndividuos);
 		return melhoresIndividuos;
+	}
+	
+	/**
+	 * @author raquel silveira
+	 * @version 1.0
+	 * metodo que verifica se o individuo ja foi inserido na lista dos melhores individuos
+	 * @param melhoresIndividuos
+	 * @param individuo
+	 * @return true -> ja foi inserido na lista
+	 */
+	private boolean verificaMelhorIndividuoRepetido(Populacao melhoresIndividuos, Individuo individuo) {
+		for(Individuo ind : melhoresIndividuos.getIndividuo()) {
+			if (ind.getCenario().equals(individuo.getCenario())) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**
@@ -194,14 +239,17 @@ public class Estrategia{
 	 * @param populacao
 	 * @return melhor fitness entre os individuos
 	 * */
-	private int obtemMelhorFitness(Populacao populacao) {
-		int melhorFitness = Integer.MAX_VALUE;
+	private Integer obtemMelhorFitness(Populacao populacao) {
+		Integer melhorFitness = null;
 		for(Individuo i : populacao.getIndividuo()) {
+			
+			//Define o melhorFitness para o primeiro individuo
+			if (melhorFitness == null)
+				melhorFitness = i.getAvaliacao();
+						
 			if (i.getAvaliacao() != null && i.getAvaliacao() < melhorFitness)
 				melhorFitness = i.getAvaliacao();
 		}
-		
-		System.out.println("Melhor fitness: " + melhorFitness);
 		return melhorFitness;
 	}
 	
@@ -224,7 +272,7 @@ public class Estrategia{
 			int[] paresMutacao = obtemParesMutacao();		
 			Populacao populacaoMutacao = mutacao(populacaoCruzada.clone(), paresMutacao);
 								
-			arquivo.imprime2(populacaoPares, populacaoCruzada, paresMutacao, populacaoMutacao);
+			//arquivo.imprime2(populacaoPares, populacaoCruzada, paresMutacao, populacaoMutacao);
 			return populacaoMutacao;
 		}
 		catch(CloneNotSupportedException e) {}
@@ -238,13 +286,13 @@ public class Estrategia{
 	 * @param populacao
 	 * @return fitness medio dos individuos
 	 * */
-	private double obtemFitnessMedio(Populacao populacao) {
+	/*private double obtemFitnessMedio(Populacao populacao) {
 		int fitness = 0;
 		for(int i = 0; i < populacao.getIndividuo().size(); i++) {
 			fitness += (populacao.getIndividuo().get(i).getAvaliacao() != null ? populacao.getIndividuo().get(i).getAvaliacao() : 0);
 		}
 		return fitness/populacao.getIndividuo().size();
-	}
+	}*/
 	
 	/**
 	 * @author raquel silveira
@@ -264,9 +312,9 @@ public class Estrategia{
 		//Seleciona os individuos conforme metodo da roleta
 		Populacao pares = new Populacao();
 		try {
-			Random random = new Random();
 			for (int i = 0; i < N; i++) {
-				int selecao = random.nextInt(Math.abs(fitness)); //O abs eh adicionado para evitar problemas com valores negativos
+				
+				int selecao = fitness == 0 ? 0 : new Random().nextInt(Math.abs(fitness)); //O abs eh adicionado para evitar problemas com valores negativos
 				
 				Individuo novoIndividuo = obtemIndividuoFitnessAcumulado(populacao, selecao).clone();
 				novoIndividuo.setHistoria(new ArrayList<Estado>());
@@ -316,12 +364,21 @@ public class Estrategia{
 	private Populacao cruzamento(Populacao pares) {
 		Random random = new Random();
 		for (int i = 0; i < N; i+=2) {
-			Integer[] aux = pares.getIndividuo().get(i).getCenario().clone();
+			Integer[][] aux = pares.getIndividuo().get(i).getCenario().clone();
 			int Pc = random.nextInt(N);
-			for (int j = 1; j <= Pc; j++) {
-				pares.getIndividuo().get(i).getCenario()[j] = pares.getIndividuo().get(i+1).getCenario()[j];
-				pares.getIndividuo().get(i+1).getCenario()[j] = aux[j];
+			int linhaFim = (Pc-1)/qLinhaColuna; //representa ate que linha sera percorrido
+			int colunaFim = (Pc-1)%qLinhaColuna; //representa ate que coluna sera percorrido
+			
+			//Percorre a matriz para efetuar o cruzamento
+			for (int j = 0; j < linhaFim; j++) {
+				for (int z = 0; (z < qLinhaColuna && j < linhaFim-1) || (z <= colunaFim && j == linhaFim); z++) { 
+					pares.getIndividuo().get(i).getCenario()[j][z] = pares.getIndividuo().get(i+1).getCenario()[j][z];
+					pares.getIndividuo().get(i+1).getCenario()[j][z] = aux[j][z];
+				}
 			}
+			
+			//System.arraycopy(pares.getIndividuo().get(i+1), 0, pares.getIndividuo().get(i), 0, Pc);
+			//System.arraycopy(aux, 0, pares.getIndividuo().get(i+1), 0, Pc);
 		}
 		return pares;
 	}
@@ -354,9 +411,13 @@ public class Estrategia{
 		Random random = new Random();
 		int novoCodigo = 0;
 		for(int i = 0; i < paresMutacao.length; i+=2) {
+			int linha = (paresMutacao[i+1]-1)/qLinhaColuna;
+			int coluna = paresMutacao[i+1]-1 < 0 ? 0 : (paresMutacao[i+1]-1)%qLinhaColuna; 
+			
 			do { novoCodigo = random.nextInt(QE); }
-			while(pares.getIndividuo().get(paresMutacao[i]).getCenario()[paresMutacao[i+1]+1] == novoCodigo);
-			pares.getIndividuo().get(paresMutacao[i]).setValorCenario(paresMutacao[i+1]+1, novoCodigo);
+			while(pares.getIndividuo().get(paresMutacao[i]).getCenario()[linha][coluna] == novoCodigo);
+			
+			pares.getIndividuo().get(paresMutacao[i]).setValorCenario(linha, coluna, novoCodigo);
 		}		
 		return pares;
 	}

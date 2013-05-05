@@ -4,8 +4,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+
+import ambiente.Estado;
 
 import testador.Individuo;
 import testador.Populacao;
@@ -134,14 +137,59 @@ public class ArquivoUtils {
 			arquivo.write("Cenário de teste: ");
 			arquivo.write(cenario.toString());
 			arquivo.newLine();
+			arquivo.write("Melhor história: ");
 			if (cenario != null && cenario.getHistoria() != null && cenario.getHistoria().size() > 0)
-			{ arquivo.write("História: " + Arrays.toString(cenario.getHistoria().toArray())); }
+			{ arquivo.write(Arrays.toString(cenario.getHistoria().toArray())); }
 			arquivo.newLine();
 			arquivo.newLine();
 			arquivo.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}	
+	}
+	
+	public void imprimeGeracao(int geracao) {
+		try {
+			BufferedWriter arquivo = new BufferedWriter(new FileWriter(this.path, true));
+			arquivo.write("============================================================");
+			arquivo.newLine();
+			arquivo.write("Geração: " + geracao);
+			arquivo.newLine();
+			arquivo.newLine();
+			arquivo.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void imprimeCasoTeste(Individuo casoTeste){
+		try {
+			BufferedWriter arquivo = new BufferedWriter(new FileWriter(this.path, true));
+			arquivo.write("------------------------------------------------------------");
+			arquivo.newLine();
+			arquivo.write("Caso de teste: ");
+			arquivo.write(casoTeste.toString());
+			arquivo.newLine();
+			arquivo.newLine();
+			arquivo.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+	}
+	
+	
+	public void imprimeAvaliacao(ArrayList<Estado> historia, int avaliacao) {
+		try {
+			BufferedWriter arquivo = new BufferedWriter(new FileWriter(this.path, true));
+			arquivo.write("História: " + historia.toString());
+			arquivo.newLine();
+			arquivo.write("Avaliação: " + avaliacao);
+			arquivo.newLine();
+			arquivo.newLine();
+			arquivo.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
 

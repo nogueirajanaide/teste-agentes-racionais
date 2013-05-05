@@ -4,11 +4,13 @@ import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
-import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import ferramenta.frmGrafico;
+import ferramenta.frmResultado;
 
 import agente.Acao;
 import ambiente.Ambiente;
@@ -48,6 +50,8 @@ public class Testador extends Agent{
 	int interacao = 0;
 	Estrategia estrategia = new Estrategia();
 	private int repeticaoAtual = 0;
+	ArrayList<Individuo> individuosSelecionados = new ArrayList<Individuo>();
+	
 	
 	/**
 	 * @author raquel silveira
@@ -71,7 +75,7 @@ public class Testador extends Agent{
 	 */
 	private void ver() {
 		
-		System.out.println("Ver: " + Estrategia.geracao + " " + interacao);	
+		//System.out.println("Ver: " + Estrategia.geracao + " " + interacao);	
 	}
 	
 	/**
@@ -82,7 +86,6 @@ public class Testador extends Agent{
 	 */
 	private void proximo(){
 		
-		System.out.println("Proximo: " + Estrategia.geracao + " " + interacao);
 		//Inicia os dados do teste
 		initialise();
 		
@@ -101,29 +104,31 @@ public class Testador extends Agent{
 	 */
 	private void acao() {
 		
-		System.out.println("Acao: " + Estrategia.geracao + " " + interacao);
-		//System.out.println(Estrategia.geracao + " " + interacao);
-		if (teste())
-		{
+		if (teste()) {
 			utilidade();
 			sucessor();
 		}
 		else {
-			
 			Estrategia.arquivo.imprime3(estadoInterno.getCasosTeste(), Estrategia.melhoresIndividuos);
 			System.out.println("Melhores indivíduos = " + Estrategia.melhoresIndividuos);
 			blockingReceive();
+			mostraResultado();
 		}
 	}
 	
+	private void mostraResultado() {
+	
+		new frmGrafico(individuosSelecionados).setVisible(true);
+	}
+	
 	/**
-	 * @author raquel silveia
+	 * @author raquel silveira
 	 * @version 1.0
 	 * Metodo que verifica se eh para continuar a geracao de casos de teste
 	 * @return true - continuar a geracao de casos de teste
 	 */
 	private boolean teste() {
-		System.out.println("Teste: " + Estrategia.geracao + " " + interacao);
+		//System.out.println("Teste: " + Estrategia.geracao + " " + interacao);
 		return (Estrategia.geracao <= Estrategia.max_gera && 
 				Estrategia.melhorFitness >= Estrategia.max_fit); 
 		//Como a funcao eh de minimizacao, o melhor tem que ser maior que o maximo fitness
@@ -137,7 +142,7 @@ public class Testador extends Agent{
 	 */
 	private void initialise() {
 		
-		System.out.println("Initialise: " + Estrategia.geracao + " " + interacao + " Repeticao: " + repeticaoAtual);
+		//System.out.println("Initialise: " + Estrategia.geracao + " " + interacao + " Repeticao: " + repeticaoAtual);
 		try {
 			
 			//Caso seja o primeiro teste, obtem a populacao inicial
@@ -152,11 +157,11 @@ public class Testador extends Agent{
 					estadoInterno.getCasosTeste().getIndividuo().size() > 0 &&
 					interacao < estadoInterno.getCasosTeste().getIndividuo().size()) {
 
-				if (repeticaoAtual++ < Estrategia.repeticao) {		
+				if (++repeticaoAtual <= Estrategia.repeticao) {		
 
-					System.out.println("Repeticao: " + repeticaoAtual);
+					//System.out.println("Repeticao: " + repeticaoAtual);
+					
 					//Configura o teste com o caso de teste selecionado
-					System.out.println("Repeticao: " + repeticaoAtual);
 					configuraTeste(estadoInterno.getCasosTeste().getIndividuo().get(interacao));
 
 					//Envia msg para agente iniciar
@@ -227,28 +232,38 @@ public class Testador extends Agent{
 		//System.out.println("Test_for_termination: " + Estrategia.geracao + " " + interacao);
 		try {
 			
-			if (((Estado)receptor.getContentObject()).getAcao() == Acao.PARAR) {
-				
+			//Verifica se o agente enviou a acao PARAR e se a ultima acao da historia foi PARAR
+			if (((Estado)receptor.getContentObject()).getAcao() == Acao.PARAR && historia.get(historia.size()-1).getAcao() == Acao.PARAR){
+								
 				if (estadoInterno.getCasosTeste().getIndividuo().get(interacao).listaHistorias == null) {
 					estadoInterno.getCasosTeste().getIndividuo().get(interacao).listaHistorias = new ArrayList<ArrayList<Estado>>();
 				}
-				//Adiciona cada historia das repeticoes na lista de historias do caso de teste
-				estadoInterno.getCasosTeste().getIndividuo().get(interacao).listaHistorias.add((ArrayList<Estado>)historia.clone());
+									
+				if (estadoInterno.getCasosTeste().getIndividuo().get(interacao).listaHistorias.size() < repeticaoAtual){
+					//Adiciona cada historia das repeticoes na lista de historias do caso de teste
+					estadoInterno.getCasosTeste().getIndividuo().get(interacao).listaHistorias.add((ArrayList<Estado>)historia.clone());
+				}
 				
-				System.out.println("Geração: " + Estrategia.geracao + " - " + interacao);
-				System.out.println("Caso de teste: " +estadoInterno.getCasosTeste().getIndividuo().get(interacao));
-				System.out.println("História: " + historia);
-				System.out.println("História: " + estadoInterno.getCasosTeste().getIndividuo().get(interacao).listaHistorias.get(repeticaoAtual));
-				System.out.println("Qtde de histórias: " + estadoInterno.getCasosTeste().getIndividuo().get(interacao).listaHistorias.size());
+				//System.out.println("Começou!");
+				//System.out.println("geração: " + Estrategia.geracao + " - " + interacao + " Repeticao: " + repeticaoAtual);
+				//System.out.println("caso de teste: " +estadoInterno.getCasosTeste().getIndividuo().get(interacao));
+				//System.out.println("História: [h] " + historia);
+				//System.out.println("História:     " + estadoInterno.getCasosTeste().getIndividuo().get(interacao).listaHistorias.get(repeticaoAtual));
+				historia = new ArrayList<Estado>();
+				//System.out.println("Qtde de histórias: " + estadoInterno.getCasosTeste().getIndividuo().get(interacao).listaHistorias.size());
 				
 				//Sera adicionada a historia na lista de historias do caso de teste
 				//estadoInterno.getCasosTeste().getIndividuo().get(interacao).setHistoria((ArrayList<Estado>)historia.clone());	
 				
 				//Aqui ainda nao tem a avalicao da historia. A avaliacao eh obtida no metodo utilidade()
 				//Estrategia.arquivo.imprimeHistoria(estadoInterno.getCasosTeste().getIndividuo().get(interacao));
+				
+				historia = new ArrayList<Estado>();
+				behaviour.block();				
 				proximo();
+				
 				//interacao++;
-				behaviour.block();
+				//behaviour.block();
 				return false;
 			}
 		}
@@ -267,11 +282,9 @@ public class Testador extends Agent{
 	 */
 	private void geracao_historias(Agent myAgent, Behaviour behaviour, ACLMessage receptor) {
 		
-		//System.out.println("geracao_historias: " + Estrategia.geracao + " " + interacao);
 		try {
 			if (receptor != null) {
 				
-				//System.out.println("TESTADOR - RECEBE MSG");
 				String destino = obtemDestinario(receptor.getSender().getLocalName());
 				ACLMessage destinatario = new ACLMessage(ACLMessage.INFORM);
 				destinatario.addReceiver(new AID(destino, AID.ISLOCALNAME));
@@ -279,14 +292,11 @@ public class Testador extends Agent{
 				if (destino.equalsIgnoreCase(estadoInterno.getAGENTE())) {
 					destinatario.setContentObject(receptor.getContentObject());
 					myAgent.send(destinatario);
-					//System.out.println("TESTADOR ENVIA MSG PARA AGENTE");
 				}
 				if (destino.equalsIgnoreCase(estadoInterno.getAMBIENTE())){
 					historia.add((Estado)receptor.getContentObject());				
 					destinatario.setContentObject(((Estado)receptor.getContentObject()).getAcao());
 					myAgent.send(destinatario);
-					
-					//System.out.println("TESTADOR ENVIA MSG PARA AMBIENTE");
 				}						
 			} else {
 				behaviour.block();
@@ -320,19 +330,9 @@ public class Testador extends Agent{
 	 */
 	private void sucessor() {
 		
-		System.out.println("Sucessor: " + Estrategia.geracao + " " + interacao);
-		//System.out.println("Sucessor - Casos teste: "  + estadoInterno.getCasosTeste());
-		//System.out.println(interacao >= estadoInterno.getCasosTeste().getIndividuo().size());
-		
-		//System.out.println(interacao);
-		//System.out.println(Estrategia.geracao);
-		//System.out.println(estadoInterno.getCasosTeste().getIndividuo().size());
-			
 		//Caso a populacao ja tenha sido testada, obtem uma nova populacao
 		if (estadoInterno.getCasosTeste() == null || 
 				interacao >= estadoInterno.getCasosTeste().getIndividuo().size()) {
-			//System.out.println("Entrou no if do sucessor!");
-			//System.out.println(estadoInterno.getCasosTeste());
 			
 			interacao = 0;
 			Estrategia.geracao++;
@@ -341,14 +341,7 @@ public class Testador extends Agent{
 			} catch (CloneNotSupportedException e) {
 				e.printStackTrace();
 			}
-			
-			System.out.println("Novos individuos gerados: " + estadoInterno.getCasosTeste().toString());
-			for(int i = 0; i < estadoInterno.getCasosTeste().getIndividuo().size(); i++)
-			{
-				System.out.println("Individuo 1: " + (estadoInterno.getCasosTeste().getIndividuo().get(i).listaHistorias != null ? estadoInterno.getCasosTeste().getIndividuo().get(i).listaHistorias.size() : 0));
-			}
-			System.out.println(Estrategia.geracao + " " + interacao);
-			
+		
 			setup(); 
 		}
 	}
@@ -361,13 +354,15 @@ public class Testador extends Agent{
 	 */
 	private void utilidade() {
 
-		System.out.println("Utilidade: " + Estrategia.geracao + " " + interacao);
-
+		boolean avaliou = false;
+		//System.out.println("Utilidade: " + Estrategia.geracao + " " + interacao);
+		Estrategia.arquivo.imprimeGeracao(Estrategia.geracao);
 		//Percorre cada caso de teste
 		for (Iterator iterator = estadoInterno.getCasosTeste().getIndividuo().iterator(); iterator.hasNext();) {
 			Individuo casoTeste = (Individuo) iterator.next();
 
-			System.out.println("Avaliando as historias....");
+			Estrategia.arquivo.imprimeCasoTeste(casoTeste);
+			//System.out.println("Avaliando as historias....");
 			
 			casoTeste.setHistoria(null);
 			casoTeste.setAvaliacao(null);
@@ -384,67 +379,79 @@ public class Testador extends Agent{
 						//Obtem a avaliacao do estado da historia
 						Integer pont = obtemAvaliacao(estado);
 						if (pont != null) {
-							avaliacao += pont;	
+							avaliacao += pont;
+							estado.setPontuacao(pont);
+							avaliou = true;
 						}
 					}
 					
 					//Atribui a avaliacao da melhor historia
 					//Como a funcao eh de minimizacao eh atribuida a historia com avaliacao menor
 					//TODO: Analisar essa comparacao para deixar mais geral
-					if (casoTeste.getAvaliacao() == null || casoTeste.getAvaliacao() > avaliacao) {
-						if (casoTeste != null)
-							System.out.println("Entrou no if - " + (casoTeste.getAvaliacao() == null) + " " + (casoTeste.getAvaliacao() != null ? casoTeste.getAvaliacao() > avaliacao: false));
-						else
-							System.out.println("Entrou no if - Caso de teste é nulo!");
+					if (casoTeste.getAvaliacao() == null || casoTeste.getAvaliacao() > avaliacao) {						
 						casoTeste.setAvaliacao(avaliacao);
 						casoTeste.setHistoria((ArrayList<Estado>)historia.clone());
 					}
 					
-					System.out.println("História: " + historia);
-					System.out.println("Avaliação: " + avaliacao);
-					System.out.println("Avaliação caso de teste: " + casoTeste.getAvaliacao());
+					//System.out.println("História: " + historia);
+					//System.out.println("Avaliação: " + avaliacao);
+					//System.out.println("Avaliação caso de teste: " + casoTeste.getAvaliacao());
+					
+					Estrategia.arquivo.imprimeAvaliacao(historia, avaliacao);
 				}				
 			}
 
 			Estrategia.arquivo.imprimeHistoria(casoTeste);
-			System.out.println("Obtendo a melhor historia....");
-			System.out.println(casoTeste.toString());
-			System.out.println("Historia: " + casoTeste.getHistoria());
-			System.out.println("Avaliacao: " + casoTeste.getAvaliacao());
-		}
-		
-		
-		
-		/*
-		//System.out.println("Utilidade: " + Estrategia.geracao + " " + interacao);
-		//System.out.println("Entrou na utilidade");
-		//System.out.println("Casos teste:" + estadoInterno.getCasosTeste());
-		for (Iterator iterator = estadoInterno.getCasosTeste().getIndividuo().iterator(); iterator.hasNext();) {
-			Individuo casoTeste = (Individuo) iterator.next();
-			
-			int avaliacao = 0;
-			for (Iterator iterator2 = casoTeste.getHistoria().iterator(); iterator2.hasNext();) {
-				Estado estado = (Estado) iterator2.next();
-				//Obtem a avaliacao do estado da historia
-				Integer pont = obtemAvaliacao(estado);
-				if (pont != null) {
-					avaliacao += pont;	
-				}
-			}
-			casoTeste.setAvaliacao(avaliacao);
-			
-			Estrategia.arquivo.imprimeHistoria(casoTeste);
-			//System.out.println("Geracao: " + Estrategia.geracao + " Interacao: " + interacao);
+			//System.out.println("Obtendo a melhor historia....");
 			//System.out.println(casoTeste.toString());
 			//System.out.println("Historia: " + casoTeste.getHistoria());
 			//System.out.println("Avaliacao: " + casoTeste.getAvaliacao());
-		}*/
+		}
 		
-		//Obtem os melhores individuos avaliados
-		Estrategia.melhoresIndividuos = estrategia.selecionaMelhores(estadoInterno.getCasosTeste(), Estrategia.melhoresIndividuos, Estrategia.geracao);
-		System.out.println("Melhores individuos: " + Estrategia.melhoresIndividuos);
-		Estrategia.melhorFitness = (Estrategia.melhoresIndividuos.getIndividuo().size() > 0 && Estrategia.melhoresIndividuos.getIndividuo().get(0).getAvaliacao() != null ? Estrategia.melhoresIndividuos.getIndividuo().get(0).getAvaliacao() : 0); 
-		System.out.println("Melhor fitness: " + Estrategia.melhorFitness);
+		if (avaliou) {
+			//Obtem os melhores individuos avaliados
+			Estrategia.melhoresIndividuos = estrategia.selecionaMelhores(estadoInterno.getCasosTeste(), Estrategia.melhoresIndividuos, Estrategia.geracao);
+			//System.out.println("Melhores individuos: " + Estrategia.melhoresIndividuos);
+			Estrategia.melhorFitness = (Estrategia.melhoresIndividuos.getIndividuo().size() > 0 && Estrategia.melhoresIndividuos.getIndividuo().get(0).getAvaliacao() != null ? Estrategia.melhoresIndividuos.getIndividuo().get(0).getAvaliacao() : 0);
+			setIndividuosSelecionados();
+
+			//System.out.println("Individuos selecionados: " + individuosSelecionados);
+			//System.out.println("Melhor fitness: " + Estrategia.melhorFitness);
+		}
+	}
+	
+	/**
+	 * @author raquel silveira
+	 * @version 1.0
+	 * metodo que armazena na variavel individuosSelecionados todos os individuos 
+	 * e marca aqueles que foram selecionados como melhores
+	 */
+	private void setIndividuosSelecionados() {
+		
+		//Adiciona os melhores individuos para a variavel individuosSelecionados
+		if (Estrategia.melhoresIndividuos.getIndividuo().size() > 0 &&
+			(individuosSelecionados.size() == 0 ||
+			(individuosSelecionados.size() > 0 &&
+			individuosSelecionados.get(individuosSelecionados.size()-1).getGeracao() != Estrategia.geracao))) {
+				for(Individuo i : Estrategia.melhoresIndividuos.getIndividuo()) {
+					Individuo iSelecionado = null;
+					try { iSelecionado = i.clone(); }
+					catch (Exception e) { }
+					iSelecionado.setGeracao(Estrategia.geracao);
+					iSelecionado.setSelecionado(true);
+					individuosSelecionados.add(iSelecionado);
+					//System.out.println("Av selecionada: " + iSelecionado.getAvaliacao());
+				}
+		}
+		
+		//Adiciona os demais individuos do caso de teste à variavel individuosSelecionados
+		for (Individuo i : estadoInterno.getCasosTeste().getIndividuo()) {
+			if (i.getAvaliacao() != null) {
+				i.setGeracao(Estrategia.geracao);
+				try { individuosSelecionados.add(i.clone()); }
+				catch (Exception e) { }
+			}
+		}
 	}
 	
 	/**
@@ -455,16 +462,17 @@ public class Testador extends Agent{
 	 * @return a pontuacao correspondente a avaliacao
 	 */
 	private Integer obtemAvaliacao(Estado estado) {
-		//System.out.println("ObtemAvaliacao: " + Estrategia.geracao + " " + interacao);
+		
+		//TODO: Identificar uma forma para nao pegar o elemento direto do estado do ambiente
 		Integer avaliacao = null;
 		for (Iterator iterator = Estrategia.funcaoAvaliacao.iterator(); iterator.hasNext();) {
 			FuncaoAvaliacao funcaoAvaliacao = (FuncaoAvaliacao) iterator.next();
 						
-			if (estado.getElemento() != null &&
-					funcaoAvaliacao.getElemento() == estado.getElemento() && 
-					funcaoAvaliacao.getAcao().equalsIgnoreCase(estado.getAcao().toString())) {
+			if (estado.getCenario() != null &&
+				estado.getCenario()[estado.getPosicaoLinha()][estado.getPosicaoColuna()] != null &&
+				funcaoAvaliacao.getElemento() == estado.getCenario()[estado.getPosicaoLinha()][estado.getPosicaoColuna()] && 
+				funcaoAvaliacao.getAcao().equalsIgnoreCase(estado.getAcao().toString()))
 				avaliacao = funcaoAvaliacao.getPontuacao();
-			}
 		}
 		return avaliacao;
 	}
@@ -481,8 +489,10 @@ public class Testador extends Agent{
 		try {
 			
 			Ambiente.estadoInterno = casoTeste.clone();
-			Ambiente.posicaoAgente = 0;
-			historia.clear();
+			//Ambiente.estadoInterno.setCenario(casoTeste.getCenario().clone());
+			Ambiente.posicaoAgenteL = 0;
+			Ambiente.posicaoAgenteC = 0;
+			historia = new ArrayList<Estado>();  
 			
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();

@@ -10,7 +10,9 @@ public enum Acao implements Serializable {
 	MOVER("Mover"),
 	ASPIRAR("Aspirar"),
 	DIREITA("Direita"),
-	ESQUERDA("Esquerda");
+	ESQUERDA("Esquerda"),
+	PARA_CIMA("Para cima"),
+	PARA_BAIXO("Para baixo");
 	
 	public String acao;
 	

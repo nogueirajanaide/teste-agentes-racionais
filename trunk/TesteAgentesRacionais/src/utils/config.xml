@@ -1,21 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <config>
 	<!-- Numero de idividuos -->
-	<N>20</N>
+	<N>30</N>
 	
 	<!-- Cod do Agente. Verificar a necessidade desta configuracao -->
 	<CodAgente>5</CodAgente>
 	
 	<!-- Parametro da mutacao -->
-	<Pm>3</Pm>
+	<Pm>5</Pm>
 	
 	<!-- Qtde maxima de geracoes -->
-	<Max_gera>60</Max_gera>
+	<Max_gera>100</Max_gera>
 	
 	<!-- Valor maximo do fitness -->
 	<Max_fit>-1000000</Max_fit>
 	
-	<!-- Diretorio de saida dos resultados -->
+	<!-- Valor maximo de interacoes -->
+	<Max_interacoes>16</Max_interacoes>
+	cannot checkout
+
+	<!-- Diretorio de saida dos resultados -->cannot checkout
+
 	<Path>C:\\Users\\Raquel\\Documents\\MACC\\Proposta\\Modelo Agente\\busca_log.txt</Path>
 	
 	<!-- Representa a qtde de repeticoes nos testes -->
@@ -36,57 +41,73 @@
 		</Detalhe>
 	</Elementos>
 	
+	<!-- Definicao dos objetivos -->
+	<Objetivos>
+		<Objetivo nome="Energia" peso="0.3"/>
+		<Objetivo nome="Limpeza" peso="0.7"/>
+	</Objetivos>
+	
 	<!-- Definicao da funcao avaliacao -->
 	<FuncaoAvaliacao>
 		<Medida>
 			<Elemento>0</Elemento>
 			<Acao>Direita</Acao>
-			<Pontuacao>-1</Pontuacao>
+			<Energia>-1</Energia>
+			<Limpeza>2</Limpeza>
 		</Medida>
 		<Medida>
 			<Elemento>0</Elemento>
 			<Acao>Esquerda</Acao>
-			<Pontuacao>-1</Pontuacao>
+			<Energia>-1</Energia>
+			<Limpeza>2</Limpeza>
 		</Medida>
 		<Medida>
 			<Elemento>0</Elemento>
 			<Acao>Para_cima</Acao>
-			<Pontuacao>-1</Pontuacao>
+			<Energia>-1</Energia>
+			<Limpeza>2</Limpeza>
 		</Medida>
 		<Medida>
 			<Elemento>0</Elemento>
 			<Acao>Para_baixo</Acao>
-			<Pontuacao>-1</Pontuacao>
+			<Energia>-1</Energia>
+			<Limpeza>2</Limpeza>
 		</Medida>
 		<Medida>
 			<Elemento>0</Elemento>
 			<Acao>Aspirar</Acao>
-			<Pontuacao>-1</Pontuacao>
+			<Energia>-2</Energia>
+			<Limpeza>0</Limpeza>
 		</Medida>
 		<Medida>
 			<Elemento>1</Elemento>
 			<Acao>Aspirar</Acao>
-			<Pontuacao>1</Pontuacao>
+			<Energia>-2</Energia>
+			<Limpeza>3</Limpeza>
 		</Medida>
 		<Medida>
 			<Elemento>1</Elemento>
 			<Acao>Direita</Acao>
-			<Pontuacao>-1</Pontuacao>
+			<Energia>-1</Energia>
+			<Limpeza>-2</Limpeza>
 		</Medida>
 		<Medida>
 			<Elemento>1</Elemento>
 			<Acao>Esquerda</Acao>
-			<Pontuacao>-1</Pontuacao>
+			<Energia>-1</Energia>
+			<Limpeza>-2</Limpeza>
 		</Medida>
 		<Medida>
 			<Elemento>1</Elemento>
 			<Acao>Para_baixo</Acao>
-			<Pontuacao>-1</Pontuacao>
+			<Energia>-1</Energia>
+			<Limpeza>-2</Limpeza>
 		</Medida>
 		<Medida>
 			<Elemento>1</Elemento>
 			<Acao>Para_cima</Acao>
-			<Pontuacao>-1</Pontuacao>
+			<Energia>-1</Energia>
+			<Limpeza>-2</Limpeza>
 		</Medida>
 	</FuncaoAvaliacao>
 </config>

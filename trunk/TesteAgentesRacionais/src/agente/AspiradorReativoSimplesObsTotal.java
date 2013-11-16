@@ -7,9 +7,6 @@ import jade.lang.acl.ACLMessage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
-
-import jmetal.metaheuristics.gde3.GDE3;
-
 import ambiente.Estado;
 
 import com.sun.org.apache.xalan.internal.xsltc.runtime.Hashtable;

@@ -12,7 +12,8 @@ public enum Acao implements Serializable {
 	DIREITA("Direita"),
 	ESQUERDA("Esquerda"),
 	PARA_CIMA("Para cima"),
-	PARA_BAIXO("Para baixo");
+	PARA_BAIXO("Para baixo"),
+	NAO_OP("Nao operar");
 	
 	public String acao;
 	

@@ -46,7 +46,7 @@ public class AgReativoSimples extends Agent{
 						} else {
 							
 							Estado estadoAmbiente = (Estado)msg.getContentObject();
-							estadoAmbiente.setAcao(obtemAcao(estadoAmbiente));					
+							estadoAmbiente.setAcao(obtemAcao(estadoAmbiente));
 							ACLMessage reply = msg.createReply();
 							reply.setPerformative(ACLMessage.INFORM);
 							reply.setContentObject(estadoAmbiente);
@@ -85,19 +85,8 @@ public class AgReativoSimples extends Agent{
 			acao = (Acao)regras.get(estadoAmbiente.getCenario()[estadoAmbiente.getPosicaoLinha()][estadoAmbiente.getPosicaoColuna()]);	
 		
 		if (acao == Acao.MOVER) {
-			
-			ArrayList<Acao> movimentos = obtemMovimentosPossiveis();
-			if (estadoAmbiente.getPosicaoLinha() == 0) 
-				movimentos.remove(Acao.PARA_CIMA);
-			if (estadoAmbiente.getPosicaoColuna() == 0)
-				movimentos.remove(Acao.ESQUERDA);
-			if (estadoAmbiente.getPosicaoColuna() == estadoAmbiente.getQtdeLinhaColuna()-1) //-1 é adicionado pois aqui considera-se os indices da matriz
-				movimentos.remove(Acao.DIREITA);
-			if (estadoAmbiente.getPosicaoLinha() == estadoAmbiente.getQtdeLinhaColuna()-1) //-1 é adicionado pois aqui considera-se os indices da matriz
-				movimentos.remove(Acao.PARA_BAIXO);
-			
+			ArrayList<Acao> movimentos = obtemMovimentosPossiveis(estadoAmbiente.getPosicaoLinha(), estadoAmbiente.getPosicaoColuna(), estadoAmbiente.getQtdeLinhaColuna());
 			acao = obtemDirecao(estadoAmbiente, movimentos);
-			//System.out.println(acao);
 		}
 		return acao;
 	}
@@ -119,7 +108,7 @@ public class AgReativoSimples extends Agent{
 	 * metodo que obtem as regras e a acao correspondente do agente
 	 * @return regras
 	 * */
-	private Hashtable obtemRegras() {
+	public Hashtable obtemRegras() {
 		Hashtable regras = new Hashtable(); //Keys: percepcao; Value: acao;
 		regras.put(0, Acao.MOVER); //0 = Limpo
 		regras.put(1, Acao.ASPIRAR); //1 = Sujo
@@ -132,12 +121,22 @@ public class AgReativoSimples extends Agent{
 	 * metodo que obtem os movimentos possiveis do agente
 	 * @return os movimentos possiveis do agente
 	 */
-	private ArrayList<Acao> obtemMovimentosPossiveis() {
+	protected ArrayList<Acao> obtemMovimentosPossiveis(int posicaoLinha, int posicaoColuna, int qtdeLinhaColuna) {
 		ArrayList<Acao> movimentos = new ArrayList<Acao>();
 		movimentos.add(Acao.DIREITA);
 		movimentos.add(Acao.ESQUERDA);
 		movimentos.add(Acao.PARA_CIMA);
 		movimentos.add(Acao.PARA_BAIXO);
+		
+		if (posicaoLinha == 0) 
+			movimentos.remove(Acao.PARA_CIMA);
+		if (posicaoColuna == 0)
+			movimentos.remove(Acao.ESQUERDA);
+		if (posicaoColuna == qtdeLinhaColuna-1) //-1 é adicionado pois aqui considera-se os indices da matriz
+			movimentos.remove(Acao.DIREITA);
+		if (posicaoLinha == qtdeLinhaColuna-1) //-1 é adicionado pois aqui considera-se os indices da matriz
+			movimentos.remove(Acao.PARA_BAIXO);
+		
 		return movimentos;
 	}
 }

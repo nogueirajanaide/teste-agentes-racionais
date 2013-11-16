@@ -1,9 +1,15 @@
 package ambiente;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.TreeMap;
+
+import testador.thestes.Individuo;
 
 import agente.Acao;
-import testador.Individuo;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
@@ -18,8 +24,11 @@ public class Ambiente extends Agent{
 	private static final long serialVersionUID = 1L;
 	
 	public static Individuo estadoInterno = null;
+	public static int maxInteracoes = 0;
+	public static int interacoes = 0;
 	public static int posicaoAgenteL = 0, posicaoAgenteC = 0; //L = Linha; C = Coluna
 	private ACLMessage msg = null;
+	
 	
 	protected void setup() {
 		addBehaviour(new CyclicBehaviour(this) {
@@ -65,7 +74,7 @@ public class Ambiente extends Agent{
 	 */
 	private void proximo(Acao acao) {
 		 
-		if (msg != null && acao != null) {		
+		if (msg != null && acao != null) {
 			alteraEstadoInterno(acao);
 		}
 	}
@@ -81,12 +90,15 @@ public class Ambiente extends Agent{
 			if (msg != null) {
 				ACLMessage reply = msg.createReply();
 				
-				if (analisaAmbiente()){
+				if (interacoes >= maxInteracoes || analisaAmbiente()){
 					reply.setContentObject(new Estado(posicaoAgenteL, posicaoAgenteC, null, estadoInterno.getCenario().length));
 				} else { 
-					reply.setContentObject(new Estado(posicaoAgenteL, posicaoAgenteC, estadoInterno.getCenario(), estadoInterno.getCenario().length));
+					reply.setContentObject(new Estado(posicaoAgenteL, posicaoAgenteC, estadoInterno.getCenario().clone(), estadoInterno.getCenario().length));
 				}
+				
+				interacoes++;
 				myAgent.send(reply);
+				
 			}
 			
 		} catch (IOException e) {
@@ -116,6 +128,89 @@ public class Ambiente extends Agent{
 	}
 	
 	/**
+	 * Metodo que verifica se acao executada pelo agente eh uma boa acao
+	 * @param acao - representa a acao executada pelo agente
+	 */
+	public static boolean verificaAcao(Estado estado) {
+	
+		boolean penalizaAcao = false;
+		
+		switch (estado.getAcao()) {
+			case DIREITA: case ESQUERDA: case PARA_CIMA: case PARA_BAIXO:
+			{
+				List<Posicao> posicoesSujas = Ambiente.identificaSalasSujas(estado);
+				
+				penalizaAcao = true;
+				if (posicoesSujas != null && posicoesSujas.size() > 0) {
+					int melhorQtdePassos = posicoesSujas.get(0).qtdePassos;
+					
+					for(Posicao pos : posicoesSujas)
+						if (pos.qtdePassos <= melhorQtdePassos)
+							melhorQtdePassos = pos.qtdePassos;
+					
+					for(Posicao pos : posicoesSujas) 
+						if (pos.qtdePassos == melhorQtdePassos) {
+							if (Ambiente.identificaMelhorAcao(pos, estado.getAcao(), estado.getPosicaoLinha(), estado.getPosicaoColuna()))
+							{
+								penalizaAcao = false;
+								break;
+							}
+						}
+				}
+				break;
+			}
+			case ASPIRAR:
+			{
+				penalizaAcao = estado.getCenario()[estado.getPosicaoLinha()][estado.getPosicaoColuna()] == 0;
+				//System.out.println("A Agent: " + estado.getAcao().toString() + " " + penalizaAcao);
+				break;
+			}
+			case NAO_OP:
+			{
+				penalizaAcao = true;
+				//System.out.println("A Agent: " + estado.getAcao().toString() + " " + penalizaAcao);
+				break;
+			}
+		}
+		return penalizaAcao;
+	}
+	
+	/**
+	 * Metodo que identifica se a acao executada pelo ambiente leva a uma sala suja
+	 * @param estadoAmbiente
+	 * @param pos - representa a posicao de uma sala suja
+	 * @param acao - representa a acao executada pelo agente
+	 * @return
+	 */
+	public static boolean identificaMelhorAcao(Posicao pos, Acao acao, int posL, int posC) {
+		
+		List<Acao> acoesPossiveis = new ArrayList<Acao>();
+		if (pos.linha > posL) acoesPossiveis.add(Acao.PARA_BAIXO);
+		if (pos.linha < posL) acoesPossiveis.add(Acao.PARA_CIMA);
+		if (pos.coluna > posC) acoesPossiveis.add(Acao.DIREITA);
+		if (pos.coluna < posC) acoesPossiveis.add(Acao.ESQUERDA);
+		
+		//System.out.println("A Agent: " + acao.toString() + " A pos: " + acoesPossiveis.toString());
+		return acoesPossiveis.contains(acao);
+	}
+	
+	/**
+	 * Metodo que identifica as salas sujas no ambiente
+	 * @param estadoAmbiente
+	 * @return
+	 */
+	public static ArrayList<Posicao> identificaSalasSujas(Estado estado) {
+		ArrayList<Posicao> posicoesSujas = new ArrayList<Posicao>();
+		for (int i = 0; i < estado.getCenario().length; i++)
+			for (int j = 0; j < estado.getCenario().length; j++)
+			{
+				if (estado.getCenario()[i][j] == 1) //1: Sala suja
+					posicoesSujas.add(new Posicao(i, j, Math.abs(estado.getPosicaoLinha() - i) + Math.abs(estado.getPosicaoColuna() - j)));
+			}
+		return posicoesSujas;
+	}
+	
+	/**
 	 * @author raquel silveira
 	 * @version 1.0
 	 * metodo que verifica se todo o ambiente estah limpo
@@ -132,3 +227,14 @@ public class Ambiente extends Agent{
 		return true;
 	}
 }
+
+class Posicao {
+	int linha, coluna, qtdePassos;
+	
+	Posicao(int linha, int coluna, int qtdePassos) {
+		this.linha = linha;
+		this.coluna = coluna;
+		this.qtdePassos = qtdePassos;
+	}
+}
+

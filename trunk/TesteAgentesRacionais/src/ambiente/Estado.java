@@ -1,6 +1,10 @@
 package ambiente;
 
 import java.io.Serializable;
+import java.util.Enumeration;
+import java.util.Hashtable;
+
+import testador.thestes.Estrategia;
 
 import agente.Acao;
 
@@ -21,11 +25,15 @@ public class Estado implements Serializable {
 	
 	private int qtdeLinhaColuna;
 	
+	private boolean penaliza;
+
 	private Integer[][] cenario;
 	
 	private Acao acao;
 	
-	private int pontuacao;
+	public Hashtable<String, Double> pontuacaoObjetivos = new Hashtable<String, Double>();
+	
+	public Hashtable<String, Boolean> episodioProblema = new Hashtable<String, Boolean>();
 	
 	public int getPosicaoLinha() {
 		return posicaoLinha;
@@ -51,6 +59,14 @@ public class Estado implements Serializable {
 		this.qtdeLinhaColuna = qtdeLinhaColuna;
 	}
 	
+	public boolean isPenaliza() {
+		return penaliza;
+	}
+
+	public void setPenaliza(boolean penaliza) {
+		this.penaliza = penaliza;
+	}
+	
 	public Integer[][] getCenario() {
 		return cenario;
 	}
@@ -65,20 +81,25 @@ public class Estado implements Serializable {
 	
 	public void setAcao(Acao acao) {
 		this.acao = acao;
-	}
-	
-	public int getPontuacao() {
-		return pontuacao;
-	}
-	
-	public void setPontuacao(int pontuacao) {
-		this.pontuacao = pontuacao;
-	}
+	}	
 	
 	@Override
 	public String toString() {
 		if (cenario != null)
-			return posicaoLinha + "," + posicaoColuna + " - " + cenario[posicaoLinha][posicaoColuna] + " --> " + acao + " [" + pontuacao + "] ";
+		{
+			String result = posicaoLinha + "," + posicaoColuna + " - " + cenario[posicaoLinha][posicaoColuna] + " --> " + acao + " [";
+			
+			Enumeration<String> e = pontuacaoObjetivos.keys();
+			while(e.hasMoreElements())
+			{
+				String chave = (String)e.nextElement();
+				if (pontuacaoObjetivos.containsKey(chave))
+					result += "(" + chave + " " + pontuacaoObjetivos.get(chave) + ") ";  
+			}
+			
+			result += (penaliza ? "(Penalidade: " + Estrategia.penalidade + ") " : "") + "] ";
+			return result;
+		}
 		return "";
 	}
 }

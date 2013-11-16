@@ -3,8 +3,6 @@ package agente;
 import java.util.ArrayList;
 import java.util.Random;
 
-import testador.Estrategia;
-
 import ambiente.Estado;
 
 import com.sun.org.apache.xalan.internal.xsltc.runtime.Hashtable;
@@ -104,10 +102,6 @@ public class AspiradorReativoSimples extends Agent {
 		Hashtable regras = new Hashtable(); //Keys: percepcao; Value: acao;
 		regras.put(0, Acao.MOVER); //0 = Limpo
 		regras.put(1, Acao.ASPIRAR); //1 = Sujo
-		regras.put(2, Acao.ASPIRAR); //TODO: Modificar acao
-		regras.put(3, Acao.ASPIRAR); //TODO: Modificar acao
-		regras.put(4, Acao.ASPIRAR); //TODO: Modificar acao
-		regras.put(5, Acao.ASPIRAR); //TODO: Modificar acao
 		return regras;
 	}
 	

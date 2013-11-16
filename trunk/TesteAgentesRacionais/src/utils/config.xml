@@ -1,26 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <config>
 	<!-- Numero de idividuos -->
-	<N>30</N>
+	<N>10</N>
 	
 	<!-- Cod do Agente. Verificar a necessidade desta configuracao -->
 	<CodAgente>5</CodAgente>
 	
 	<!-- Parametro da mutacao -->
-	<Pm>5</Pm>
+	<Pm>3</Pm>
 	
 	<!-- Qtde maxima de geracoes -->
-	<Max_gera>100</Max_gera>
+	<Max_gera>30</Max_gera>
 	
 	<!-- Valor maximo do fitness -->
 	<Max_fit>-1000000</Max_fit>
 	
 	<!-- Valor maximo de interacoes -->
-	<Max_interacoes>16</Max_interacoes>
-	cannot checkout
+	<Max_interacoes>25</Max_interacoes>
 
 	<!-- Diretorio de saida dos resultados -->cannot checkout
-
 	<Path>C:\\Users\\Raquel\\Documents\\MACC\\Proposta\\Modelo Agente\\busca_log.txt</Path>
 	
 	<!-- Representa a qtde de repeticoes nos testes -->
@@ -32,19 +30,22 @@
 	<!-- A quantidade de elementos deve formar uma matriz quadrada -->
 	<Elementos>
 		<Detalhe>
-			<Qtde>8</Qtde>
+			<Qtde>15</Qtde>
 			<Codigo>0</Codigo> <!-- 0: Limpo -->
 		</Detalhe>
 		<Detalhe>
-			<Qtde>8</Qtde>
+			<Qtde>10</Qtde>
 			<Codigo>1</Codigo> <!-- 1: Sujo -->
 		</Detalhe>
 	</Elementos>
 	
+	<!-- Valor da penalidade para as acoes executadas incorretamente -->
+	<Penalidade>-1</Penalidade>
+	
 	<!-- Definicao dos objetivos -->
 	<Objetivos>
-		<Objetivo nome="Energia" peso="0.3"/>
-		<Objetivo nome="Limpeza" peso="0.7"/>
+		<Objetivo nome="Energia" peso="0.5"/>
+		<Objetivo nome="Limpeza" peso="0.5"/>
 	</Objetivos>
 	
 	<!-- Definicao da funcao avaliacao -->
@@ -52,62 +53,74 @@
 		<Medida>
 			<Elemento>0</Elemento>
 			<Acao>Direita</Acao>
-			<Energia>-1</Energia>
-			<Limpeza>2</Limpeza>
+			<Energia pont="-2" problema="0" /> <!-- pont: pontuacao para o objetivo; problema: 1 se o episodio eh problema p esse objetivo-->
+			<Limpeza pont="1" problema="0" />
 		</Medida>
 		<Medida>
 			<Elemento>0</Elemento>
 			<Acao>Esquerda</Acao>
-			<Energia>-1</Energia>
-			<Limpeza>2</Limpeza>
+			<Energia pont="-2" problema="0" />
+			<Limpeza pont="1" problema="0" />
 		</Medida>
 		<Medida>
 			<Elemento>0</Elemento>
 			<Acao>Para_cima</Acao>
-			<Energia>-1</Energia>
-			<Limpeza>2</Limpeza>
+			<Energia pont="-2" problema="0" />
+			<Limpeza pont="1" problema="0" />
 		</Medida>
 		<Medida>
 			<Elemento>0</Elemento>
 			<Acao>Para_baixo</Acao>
-			<Energia>-1</Energia>
-			<Limpeza>2</Limpeza>
+			<Energia pont="-2" problema="0" />
+			<Limpeza pont="1" problema="0" />
 		</Medida>
 		<Medida>
 			<Elemento>0</Elemento>
 			<Acao>Aspirar</Acao>
-			<Energia>-2</Energia>
-			<Limpeza>0</Limpeza>
+			<Energia pont="-1" problema="1" />
+			<Limpeza pont="0" problema="1" />
+		</Medida>
+		<Medida>
+			<Elemento>0</Elemento>
+			<Acao>Nao_op</Acao>
+			<Energia pont="0" problema="0" />
+			<Limpeza pont="0" problema="1" />
 		</Medida>
 		<Medida>
 			<Elemento>1</Elemento>
 			<Acao>Aspirar</Acao>
-			<Energia>-2</Energia>
-			<Limpeza>3</Limpeza>
+			<Energia pont="-1" problema="0" />
+			<Limpeza pont="2" problema="0" />
 		</Medida>
 		<Medida>
 			<Elemento>1</Elemento>
 			<Acao>Direita</Acao>
-			<Energia>-1</Energia>
-			<Limpeza>-2</Limpeza>
+			<Energia pont="-2" problema="1" />
+			<Limpeza pont="-1" problema="1" />
 		</Medida>
 		<Medida>
 			<Elemento>1</Elemento>
 			<Acao>Esquerda</Acao>
-			<Energia>-1</Energia>
-			<Limpeza>-2</Limpeza>
+			<Energia pont="-2" problema="1" />
+			<Limpeza pont="-1" problema="1" />
 		</Medida>
 		<Medida>
 			<Elemento>1</Elemento>
 			<Acao>Para_baixo</Acao>
-			<Energia>-1</Energia>
-			<Limpeza>-2</Limpeza>
+			<Energia pont="-2" problema="1" />
+			<Limpeza pont="-1" problema="1" />
 		</Medida>
 		<Medida>
 			<Elemento>1</Elemento>
 			<Acao>Para_cima</Acao>
-			<Energia>-1</Energia>
-			<Limpeza>-2</Limpeza>
+			<Energia pont="-2" problema="1" />
+			<Limpeza pont="-1" problema="1" />
+		</Medida>
+		<Medida>
+			<Elemento>1</Elemento>
+			<Acao>Nao_op</Acao>
+			<Energia pont="0" problema="0" />
+			<Limpeza pont="-1" problema="1" />
 		</Medida>
 	</FuncaoAvaliacao>
 </config>

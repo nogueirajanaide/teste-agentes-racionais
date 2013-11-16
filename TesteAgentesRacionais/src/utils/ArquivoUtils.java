@@ -7,11 +7,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 import ambiente.Estado;
 
-import testador.Individuo;
-import testador.Populacao;
+import testador.thestes.Estrategia;
+import testador.thestes.Individuo;
+import testador.thestes.Populacao;
+import testador.thestes.Individuo.Historias;
 
 public class ArquivoUtils {
 	
@@ -131,7 +135,7 @@ public class ArquivoUtils {
 	 * metodo que imprime a historia de um determinado cenario de teste
 	 * @param cenario
 	 * */
-	public void imprimeHistoria(Individuo cenario) {
+	public void imprimeMelhorHistoria(Individuo cenario) {
 		try {
 			BufferedWriter arquivo = new BufferedWriter(new FileWriter(this.path, true));
 			arquivo.write("Cenário de teste: ");
@@ -140,6 +144,29 @@ public class ArquivoUtils {
 			arquivo.write("Melhor história: ");
 			if (cenario != null && cenario.getHistoria() != null && cenario.getHistoria().size() > 0)
 			{ arquivo.write(Arrays.toString(cenario.getHistoria().toArray())); }
+			arquivo.newLine();
+			arquivo.newLine();
+			arquivo.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+	}
+	
+	/**
+	 * @author raquel silveira
+	 * @version 1.0 
+	 * metodo que imprime a historia de um determinado cenario de teste
+	 * @param cenario
+	 * */
+	public void imprimeAvaliacaoCasoTeste(Individuo cenario) {
+		try {
+			BufferedWriter arquivo = new BufferedWriter(new FileWriter(this.path, true));
+			arquivo.write("Cenário de teste: ");
+			arquivo.write(cenario.toString());
+			arquivo.newLine();
+			arquivo.write("Avaliação: ");
+			if (cenario != null && cenario.getAvaliacao() != null)
+				arquivo.write(cenario.getAvaliacao().toString());
 			arquivo.newLine();
 			arquivo.newLine();
 			arquivo.close();
@@ -178,12 +205,22 @@ public class ArquivoUtils {
 	}
 	
 	
-	public void imprimeAvaliacao(ArrayList<Estado> historia, int avaliacao) {
+	public void imprimeAvaliacao(Historias historia, Hashtable<String, Double> avaliacao) {
 		try {
 			BufferedWriter arquivo = new BufferedWriter(new FileWriter(this.path, true));
-			arquivo.write("História: " + historia.toString());
+			arquivo.write("História: " + historia.historia.toString());
 			arquivo.newLine();
-			arquivo.write("Avaliação: " + avaliacao);
+			String av = "Avaliação: ";
+			Enumeration<String> e = avaliacao.keys();
+			while(e.hasMoreElements())
+			{
+				String chave = (String)e.nextElement();
+				av += "(" + chave + ": " + avaliacao.get(chave) + ") ";
+			}
+			
+			av += "(Penalidades: " + historia.getQtdePenalidades() + ") ";
+			av += " (Qtde salas sujas: " + historia.salasSujas + ") "; 
+			arquivo.write(av);
 			arquivo.newLine();
 			arquivo.newLine();
 			arquivo.close();
